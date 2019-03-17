@@ -11,6 +11,8 @@ import org.springframework.stereotype.Service;
 
 import com.recipe.api.dao.IngredientDao;
 import com.recipe.api.dao.RecipeDao;
+import com.recipe.api.exception.DataNotAvailableException;
+import com.recipe.api.exception.JsonDataException;
 import com.recipe.api.model.Ingredient;
 import com.recipe.api.model.Recipe;
 
@@ -24,7 +26,7 @@ public class RecipeServiceImpl implements RecipeService {
 	private IngredientDao ingredientDao;
 
 	@Override
-	public Recipe[] findLunchRecipes() {
+	public Recipe[] findLunchRecipes() throws DataNotAvailableException, JsonDataException {
 		// Find usable ingredients which have future use by date
 		Map<String, Ingredient> usableIngredients = findUsableIngredients(ingredientDao.findAll());
 		if (usableIngredients.isEmpty()) {

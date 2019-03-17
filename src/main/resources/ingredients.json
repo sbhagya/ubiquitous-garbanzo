@@ -1,0 +1,82 @@
+[
+	{
+		"title": "Ham",
+		"best-before": "2019-03-18",
+		"use-by": "2019-03-21"
+	},
+	{
+		"title": "Cheese",
+		"best-before": "2019-03-18",
+		"use-by": "2019-03-21"
+	},
+	{
+		"title": "Bread",
+		"best-before": "2019-03-18",
+		"use-by": "2019-03-21"
+	},
+	{
+		"title": "Butter",
+		"best-before": "2019-03-18",
+		"use-by": "2019-03-21"
+	},
+	{
+		"title": "Bacon",
+		"best-before": "2019-03-11",
+		"use-by": "2019-03-18"
+	},
+	{
+		"title": "Eggs",
+		"best-before": "2019-03-11",
+		"use-by": "2019-03-18"
+	},
+	{
+		"title": "Mushrooms",
+		"best-before": "2019-03-01",
+		"use-by": "2019-03-04"
+	},
+	{
+		"title": "Sausage",
+		"best-before": "2019-03-11",
+		"use-by": "2019-03-18"
+	},
+	{
+		"title": "Hotdog Bun",
+		"best-before": "2019-03-01",
+		"use-by": "2019-03-18"
+	},
+	{
+		"title": "Ketchup",
+		"best-before": "2019-03-16",
+		"use-by": "2019-03-21"
+	},
+	{
+		"title": "Mustard",
+		"best-before": "2019-03-16",
+		"use-by": "2019-03-21"
+	},
+	{
+		"title": "Lettuce",
+		"best-before": "2019-03-11",
+		"use-by": "2019-03-18"
+	},
+	{
+		"title": "Tomato",
+		"best-before": "2019-03-11",
+		"use-by": "2019-03-18"
+	},
+	{
+		"title": "Cucumber",
+		"best-before": "2019-03-11",
+		"use-by": "2019-03-18"
+	},
+	{
+		"title": "Beetroot",
+		"best-before": "2019-03-11",
+		"use-by": "2019-03-18"
+	},
+	{
+		"title": "Salad Dressing",
+		"best-before": "2019-03-01",
+		"use-by": "2019-03-04"
+	}
+]
