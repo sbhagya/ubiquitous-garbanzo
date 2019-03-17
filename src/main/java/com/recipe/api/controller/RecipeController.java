@@ -14,6 +14,11 @@ public class RecipeController {
 	
 	@Autowired
 	private RecipeService recipeService;
+	
+	@GetMapping("/")
+	public String home() {
+		return "Welcome to recipes API";
+	}
 
 	@GetMapping("/lunch")
 	public Recipe[] findLunchRecipes() throws DataNotAvailableException, JsonDataException {
