@@ -43,7 +43,7 @@ public class RecipeControllerUnitTest {
 		// Prepare mock data
 		Recipe salad = new Recipe("Salad", new String[] { "Lettuce", "Tomato", "Cucumber", "Beetroot" });
 		Recipe hotdog = new Recipe("Hotdog", new String[] { "Hotdog Bun", "Sausage", "Ketchup", "Mustard" });
-		Recipe[] availableRecipes = new Recipe[] { salad, hotdog };
+		Recipe[] availableRecipes = { salad, hotdog };
 
 		when(recipeService.findLunchRecipes()).thenReturn(availableRecipes);
 		MvcResult result = this.mockMvc.perform(get("/lunch")).andReturn();

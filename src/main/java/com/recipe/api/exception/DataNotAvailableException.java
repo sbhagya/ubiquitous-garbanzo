@@ -15,7 +15,7 @@ public class DataNotAvailableException extends Exception {
 
 	private static final long serialVersionUID = 517065247962807381L;
 
-	private final static String DATA_NOT_AVAILABLE_MESSAGE = "Data not available";
+	private static final String DATA_NOT_AVAILABLE_MESSAGE = "Data not available";
 
 	public DataNotAvailableException(Throwable cause) {
 		super(DATA_NOT_AVAILABLE_MESSAGE, cause);

@@ -5,8 +5,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.when;
 
 import java.io.IOException;
-import java.util.Calendar;
-import java.util.Date;
+import java.time.LocalDate;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -58,17 +57,15 @@ public class RecipeServiceUnitTest {
 
 	@Test
 	public void findLunchRecipes_expiredIngredients() throws DataNotAvailableException, JsonDataException {
-		Calendar calendar = Calendar.getInstance();
-		calendar.add(Calendar.DAY_OF_YEAR, -2);
-		Date pastUseByDate = calendar.getTime();
-		calendar.add(Calendar.DAY_OF_YEAR, -4);
-		Date pastBestBeforeDate = calendar.getTime();
+		LocalDate pastUseByDate = LocalDate.now().minusDays(2);
+		LocalDate pastBestBeforeDate = LocalDate.now().minusDays(5);
 		// Create test data
-		Ingredient lettuce = new Ingredient("Lettuce", pastUseByDate, pastBestBeforeDate);
-		Ingredient tomato = new Ingredient("Tomato", pastUseByDate, pastBestBeforeDate);
-		Ingredient cucumber = new Ingredient("Cucumber", pastUseByDate, pastBestBeforeDate);
-		Ingredient beetroot = new Ingredient("Beetroot", pastUseByDate, pastBestBeforeDate);
-		ingredients = new Ingredient[] { lettuce, tomato, cucumber, beetroot };
+		Ingredient lettuce = new Ingredient("Lettuce", pastBestBeforeDate, pastUseByDate);
+		Ingredient tomato = new Ingredient("Tomato", pastBestBeforeDate, pastUseByDate);
+		Ingredient cucumber = new Ingredient("Cucumber", pastBestBeforeDate, pastUseByDate);
+		Ingredient beetroot = new Ingredient("Beetroot", pastBestBeforeDate, pastUseByDate);
+		Ingredient cheese = new Ingredient("Cheese", pastBestBeforeDate, pastUseByDate);
+		ingredients = new Ingredient[] { lettuce, tomato, cucumber, beetroot, cheese };
 
 		when(recipeDao.findAll()).thenReturn(recipes);
 		when(ingredientDao.findAll()).thenReturn(ingredients);
@@ -81,9 +78,34 @@ public class RecipeServiceUnitTest {
 	@Test
 	public void findLunchRecipes_availableValidIngredientsAndOrderByBestBefore()
 			throws JsonDataException, DataNotAvailableException, IOException {
-		// TODO Create dynamic data set to avoid sample test data files
-		// Load sample test ingredient set
-		ingredients = JsonUtil.jsonFile2Object(testIngredientsResource.getInputStream(), Ingredient[].class);
+		// Ingredients with future use by and best before dates
+		Ingredient eggs = new Ingredient("Eggs", LocalDate.now().plusDays(2), LocalDate.now().plusDays(4));
+		Ingredient mushroom = new Ingredient("Mushroom", LocalDate.now().plusDays(3), LocalDate.now().plusDays(5));
+		Ingredient milk = new Ingredient("Milk", LocalDate.now().plusDays(4), LocalDate.now().plusDays(6));
+		Ingredient salt = new Ingredient("Salt", LocalDate.now().plusDays(1), LocalDate.now().plusDays(5));
+		Ingredient pepper = new Ingredient("Pepper", LocalDate.now().plusDays(2), LocalDate.now().plusDays(6));
+		Ingredient spinach = new Ingredient("Spinach", LocalDate.now().plusDays(3), LocalDate.now().plusDays(7));
+		// Ingredients with future use by but past best before dates
+		Ingredient cucumber = new Ingredient("Cucumber", LocalDate.now().minusDays(3), LocalDate.now().plusDays(6));
+		Ingredient beetroot = new Ingredient("Beetroot", LocalDate.now().minusDays(1), LocalDate.now().plusDays(4));
+		Ingredient bacon = new Ingredient("Bacon", LocalDate.now().minusDays(7), LocalDate.now().plusDays(7));
+		Ingredient bakedBeans = new Ingredient("Baked Beans", LocalDate.now().minusDays(8),
+				LocalDate.now().plusDays(7));
+		Ingredient mushrooms = new Ingredient("Mushrooms", LocalDate.now().minusDays(6), LocalDate.now().plusDays(7));
+		Ingredient bread = new Ingredient("Bread", LocalDate.now().minusDays(3), LocalDate.now().plusDays(7));
+		Ingredient sausage = new Ingredient("Sausage", LocalDate.now().minusDays(4), LocalDate.now().plusDays(3));
+		// Ingredients with today use by but past best before dates
+		Ingredient lettuce = new Ingredient("Lettuce", LocalDate.now().minusDays(2), LocalDate.now());
+		Ingredient tomato = new Ingredient("Tomato", LocalDate.now().minusDays(4), LocalDate.now());
+		// Ingredients with past use by and best before dates
+		Ingredient hotdogBun = new Ingredient("Hotdog Bun", LocalDate.now().minusDays(4), LocalDate.now().minusDays(2));
+		Ingredient ketchup = new Ingredient("Ketchup", LocalDate.now().minusDays(4), LocalDate.now().minusDays(2));
+		Ingredient mustard = new Ingredient("Mustard", LocalDate.now().minusDays(4), LocalDate.now().minusDays(4));
+		Ingredient ham = new Ingredient("Ham", LocalDate.now().minusDays(5), LocalDate.now().minusDays(2));
+		Ingredient cheese = new Ingredient("Cheese", LocalDate.now().minusDays(6), LocalDate.now().minusDays(3));
+
+		ingredients = new Ingredient[] { eggs, mushroom, milk, salt, pepper, spinach, lettuce, tomato, cucumber,
+				beetroot, bacon, bakedBeans, mushrooms, bread, sausage, hotdogBun, ketchup, mustard, ham, cheese };
 
 		when(recipeDao.findAll()).thenReturn(recipes);
 		when(ingredientDao.findAll()).thenReturn(ingredients);
@@ -91,8 +113,8 @@ public class RecipeServiceUnitTest {
 		Recipe[] lunchRecipes = recipeService.findLunchRecipes();
 		assertNotNull(lunchRecipes);
 		assertEquals(lunchRecipes.length, 3);
-		assertEquals(lunchRecipes[0].getTitle(), "Ham and Cheese Toastie");
+		assertEquals(lunchRecipes[0].getTitle(), "Omelette");
 		assertEquals(lunchRecipes[1].getTitle(), "Salad");
-		assertEquals(lunchRecipes[2].getTitle(), "Hotdog");
+		assertEquals(lunchRecipes[2].getTitle(), "Fry-up");
 	}
 }

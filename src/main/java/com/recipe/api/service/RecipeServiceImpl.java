@@ -1,10 +1,8 @@
 package com.recipe.api.service;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
+import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -25,37 +23,27 @@ public class RecipeServiceImpl implements RecipeService {
 	@Autowired
 	private IngredientDao ingredientDao;
 
+	interface ValidateReceipes {
+		void validate(Recipe recipe, List<Recipe> suitableRecipes);
+	}
+
 	@Override
 	public Recipe[] findLunchRecipes() throws DataNotAvailableException, JsonDataException {
-		// Find usable ingredients which have future use by date
-		Map<String, Ingredient> usableIngredients = findUsableIngredients(ingredientDao.findAll());
+		Ingredient[] ingredients = ingredientDao.findAll();
+		if (ingredients.length == 0) {
+			return new Recipe[0];
+		}
+		// Filter expired ingredients
+		List<Ingredient> usableIngredients = Arrays.stream(ingredients)
+				.filter(ingredient -> !ingredient.isPastUseByDate()).collect(Collectors.toList());
 		if (usableIngredients.isEmpty()) {
 			return new Recipe[0];
 		}
-		// Find all recipes
+
 		Recipe[] recipes = recipeDao.findAll();
-		List<Recipe> suitableRecipes = new ArrayList<Recipe>();
-		for (Recipe recipe : recipes) {
-			// Check whether usable ingredients have all required ingredients for the recipe
-			// and update the ingredient with oldest best before date
-			if (recipe.validateIngredientsAvailability(usableIngredients)) {
-				suitableRecipes.add(recipe);
-			}
-		}
-
-		Collections.sort(suitableRecipes);
-		return suitableRecipes.toArray(new Recipe[suitableRecipes.size()]);
-	}
-
-	private Map<String, Ingredient> findUsableIngredients(Ingredient[] ingredients) {
-		Map<String, Ingredient> usableIngredients = new HashMap<String, Ingredient>();
-		// Filter out ingredients with past use by date
-		for (Ingredient ingredient : ingredients) {
-			if (!ingredient.isPastUseByDate()) {
-				usableIngredients.put(ingredient.getTitle(), ingredient);
-			}
-		}
-		return usableIngredients;
+		// Find matching recipes for available ingredient
+		return Arrays.stream(recipes).filter(recipe -> recipe.validateIngredientsAvailability(usableIngredients))
+				.sorted().collect(Collectors.toList()).toArray(new Recipe[0]);
 	}
 
 }

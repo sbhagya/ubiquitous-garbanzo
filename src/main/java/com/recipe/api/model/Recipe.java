@@ -1,9 +1,9 @@
 package com.recipe.api.model;
 
-import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
+import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -11,6 +11,9 @@ public class Recipe implements Comparable<Recipe> {
 
 	private String title;
 
+	/**
+	 * Titles of the ingredients of the recipe
+	 */
 	private String[] ingredients;
 
 	@JsonIgnore
@@ -50,39 +53,37 @@ public class Recipe implements Comparable<Recipe> {
 	}
 
 	/**
-	 * Validate whether given ingredients map contains all required ingredients for
-	 * the recipe and set the ingredient with oldest past best before date if exists
+	 * Validate whether the given list of ingredients contains all required
+	 * ingredients of the recipe and set the ingredient with oldest past best before
+	 * date if exists
 	 * 
-	 * @param availableIngredients
-	 * @return boolean
+	 * @param usableIngredients
+	 * @return <b>true</b> if all required ingredients found in the list
 	 */
-	public boolean validateIngredientsAvailability(Map<String, Ingredient> availableIngredients) {
-		List<Ingredient> pastBestBeforeIngredients = new ArrayList<Ingredient>();
-		for (String ingredientTitle : this.ingredients) {
-			Ingredient ingredient = availableIngredients.get(ingredientTitle);
-			if (ingredient == null) {
-				return false;
+	public boolean validateIngredientsAvailability(List<Ingredient> usableIngredients) {
+
+		// Use parallelStream if required and machine is multi core
+		List<Ingredient> recipeIngredients = usableIngredients.stream().filter(
+				ingredient -> Arrays.stream(this.ingredients).anyMatch(title -> title.equals(ingredient.getTitle())))
+				.collect(Collectors.toList());
+
+		if (recipeIngredients.size() == this.ingredients.length) {
+			List<Ingredient> pastBestBeforeIngredients = recipeIngredients.stream()
+					.filter(ingredient -> ingredient.isPastBestBeforeDate()).sorted().collect(Collectors.toList());
+
+			if (!pastBestBeforeIngredients.isEmpty()) {
+				this.setOldestBestBeforeIngredient(pastBestBeforeIngredients.get(0));
 			}
-			if (ingredient.isPastBestBeforeDate()) {
-				pastBestBeforeIngredients.add(ingredient);
-			}
+			return true;
 		}
-		if (!pastBestBeforeIngredients.isEmpty()) {
-			Collections.sort(pastBestBeforeIngredients);
-			this.setOldestBestBeforeIngredient(pastBestBeforeIngredients.get(0));
-		}
-		return true;
+		return false;
 	}
 
 	@Override
 	public int compareTo(Recipe o) {
-		if (o.getOldestBestBeforeIngredient() == null && this.getOldestBestBeforeIngredient() != null) {
-			return 1;
-		}
-		if (o.getOldestBestBeforeIngredient() != null && this.getOldestBestBeforeIngredient() == null) {
-			return -1;
-		}
-		return o.getOldestBestBeforeIngredient().compareTo(this.getOldestBestBeforeIngredient());
+		return Comparator
+				.comparing(Recipe::getOldestBestBeforeIngredient, Comparator.nullsFirst(Comparator.reverseOrder()))
+				.compare(this, o);
 	}
 
 }

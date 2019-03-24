@@ -1,24 +1,29 @@
 package com.recipe.api.model;
 
+import java.time.LocalDate;
 import java.util.Comparator;
-import java.util.Date;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
+import com.recipe.api.util.LocalDateSerializer;
 
 public class Ingredient implements Comparable<Ingredient> {
 
 	private String title;
 
 	@JsonProperty("best-before")
-	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
-	private Date bestBefore;
+	@JsonSerialize(using=LocalDateSerializer.class)
+	@JsonDeserialize(using=LocalDateDeserializer.class)
+	private LocalDate bestBefore;
 
 	@JsonProperty("use-by")
-	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
-	private Date useBy;
+	@JsonSerialize(using=LocalDateSerializer.class)
+	@JsonDeserialize(using=LocalDateDeserializer.class)
+	private LocalDate useBy;
 
-	public Ingredient(String title, Date bestBefore, Date useBy) {
+	public Ingredient(String title, LocalDate bestBefore, LocalDate useBy) {
 		this.title = title;
 		this.bestBefore = bestBefore;
 		this.useBy = useBy;
@@ -36,28 +41,28 @@ public class Ingredient implements Comparable<Ingredient> {
 		this.title = title;
 	}
 
-	public Date getBestBefore() {
+	public LocalDate getBestBefore() {
 		return bestBefore;
 	}
 
-	public void setBestBefore(Date bestBefore) {
+	public void setBestBefore(LocalDate bestBefore) {
 		this.bestBefore = bestBefore;
 	}
 
-	public Date getUseBy() {
+	public LocalDate getUseBy() {
 		return useBy;
 	}
 
-	public void setUseBy(Date useBy) {
+	public void setUseBy(LocalDate useBy) {
 		this.useBy = useBy;
 	}
 
 	public boolean isPastUseByDate() {
-		return new Date().after(this.useBy);
+		return this.useBy.isBefore(LocalDate.now());
 	}
 
 	public boolean isPastBestBeforeDate() {
-		return new Date().after(this.bestBefore);
+		return this.bestBefore.isBefore(LocalDate.now());
 	}
 
 	@Override
